@@ -109,7 +109,7 @@ func TestJackKnife(t *testing.T) {
 func readCsv(t *testing.T, file string) [][]float64 {
 	predFile, err := os.Open(file)
 	if err != nil {
-		t.Fatalf("could not open file %s: %v", predFile, err)
+		t.Fatalf("could not open file %v: %v", predFile, err)
 	}
 
 	reader := csv.NewReader(predFile)
