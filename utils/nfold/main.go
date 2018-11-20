@@ -8,7 +8,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/lytics/CloudForest"
+	"github.com/glycerine/CloudForest"
 )
 
 func openfiles(trainfn string, testfn string) (trainW io.WriteCloser, testW io.WriteCloser) {

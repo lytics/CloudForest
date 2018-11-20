@@ -1,7 +1,7 @@
 package CloudForest
 
 import (
-	"github.com/lytics/CloudForest/sortby"
+	"github.com/glycerine/CloudForest/sortby"
 )
 
 /*SortableFeature is a wrapper for a feature and set of cases that satisfies the

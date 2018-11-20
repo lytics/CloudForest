@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/lytics/CloudForest"
+	"github.com/glycerine/CloudForest"
 )
 
 func main() {

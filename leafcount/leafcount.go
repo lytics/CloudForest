@@ -9,7 +9,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/lytics/CloudForest"
+	"github.com/glycerine/CloudForest"
 )
 
 func main() {

@@ -16,8 +16,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/lytics/CloudForest"
-	"github.com/lytics/CloudForest/stats"
+	"github.com/glycerine/CloudForest"
+	"github.com/glycerine/CloudForest/stats"
 )
 
 func main() {
