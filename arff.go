@@ -45,8 +45,7 @@ func ParseARFF(input io.Reader) *FeatureMatrix {
 					false})
 			} else {
 				data = append(data, &DenseCatFeature{
-					&CatMap{make(map[string]int, 0),
-						make([]string, 0, 0)},
+					NewCatMap(),
 					make([]int, 0, 0),
 					make([]bool, 0, 0),
 					vals[1],

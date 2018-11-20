@@ -13,8 +13,7 @@ func TestCatFeature(t *testing.T) {
 	name := "catfeature"
 
 	f := &DenseCatFeature{
-		&CatMap{make(map[string]int, 0),
-			make([]string, 0, 0)},
+		NewCatMap(),
 		make([]int, 0, 0),
 		make([]bool, 0, 0),
 		name,
@@ -157,8 +156,7 @@ func TestCatFeature(t *testing.T) {
 	}
 
 	mediumf := &DenseCatFeature{
-		&CatMap{make(map[string]int, 0),
-			make([]string, 0, 0)},
+		NewCatMap(),
 		make([]int, 0, 0),
 		make([]bool, 0, 0),
 		"mediumf",
@@ -207,8 +205,7 @@ func TestCatFeature(t *testing.T) {
 func TestBigCatFeature(t *testing.T) {
 
 	bigf := &DenseCatFeature{
-		&CatMap{make(map[string]int, 0),
-			make([]string, 0, 0)},
+		NewCatMap(),
 		make([]int, 0, 0),
 		make([]bool, 0, 0),
 		"big",
@@ -216,8 +213,7 @@ func TestBigCatFeature(t *testing.T) {
 		false}
 
 	boolf := &DenseCatFeature{
-		&CatMap{make(map[string]int, 0),
-			make([]string, 0, 0)},
+		NewCatMap(),
 		make([]int, 0, 0),
 		make([]bool, 0, 0),
 		"bool",
