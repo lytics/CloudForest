@@ -1,7 +1,6 @@
 package CloudForest
 
 import (
-	"math/rand"
 	"strings"
 	"testing"
 	"time"
@@ -383,7 +382,7 @@ func TestIris(t *testing.T) {
 		InBag:    true,
 	}
 
-	for _, target := range classtargets {
+	for idx, target := range classtargets {
 		trainingStart := time.Now()
 		model := GrowRandomForest(fm, target.(Feature), config)
 
@@ -405,7 +404,7 @@ func TestIris(t *testing.T) {
 		err := catvotes.TallyError(cattarget)
 		errCp := catvotesCp.TallyError(cattarget)
 		if err != errCp {
-			t.Fatal("Error: copied tree doesn't equal original tree")
+			t.Fatalf("Error: copied tree doesn't equal original tree, idx: %v \t %v != %v", idx, err, errCp)
 		}
 
 		switch cattarget.(type) {
@@ -427,7 +426,7 @@ func TestIris(t *testing.T) {
 	for j, Feature := range fm.Data {
 		if j != targeti {
 			for i := 0; i < Feature.Length(); i++ {
-				if rand.Float64() < .05 {
+				if rnd.Float64() < .05 {
 					Feature.PutMissing(i)
 				}
 			}
@@ -546,7 +545,7 @@ func TestTwoClassIris(t *testing.T) {
 	for j, Feature := range fm.Data {
 		if j != targeti {
 			for i := 0; i < Feature.Length(); i++ {
-				if rand.Float64() < .05 {
+				if rnd.Float64() < .05 {
 					Feature.PutMissing(i)
 				}
 			}
@@ -603,7 +602,7 @@ func TestBoston(t *testing.T) {
 	//put some missing values in
 	for _, Feature := range fm.Data[:13] {
 		for i := 0; i < Feature.Length(); i++ {
-			if rand.Float64() < .01 {
+			if rnd.Float64() < .01 {
 				Feature.PutStr(i, "NA")
 			}
 		}

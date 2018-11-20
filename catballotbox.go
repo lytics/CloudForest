@@ -1,13 +1,14 @@
 package CloudForest
 
 import (
+	"sort"
 	"sync"
 )
 
 //CatBallot is used insideof CatBallotBox to record catagorical votes in a thread safe
 //manner.
 type CatBallot struct {
-	Mutex sync.Mutex
+	Mutex sync.RWMutex
 	Map   map[int]float64
 }
 
@@ -51,26 +52,38 @@ func (bb *CatBallotBox) Vote(casei int, pred string, weight float64) {
 //if it is a Categorical or boolean feature. Ie it returns the mode
 //(the most frequent value) of all votes.
 func (bb *CatBallotBox) Tally(i int) (predicted string) {
-	predictedn := 0
-	votes := 0.0
-	bb.Box[i].Mutex.Lock()
+	var predictedn int
+	var maxVote float64
+	var ties []int
+	bb.Box[i].Mutex.RLock()
 	for k, v := range bb.Box[i].Map {
-		if v > votes {
+		if v > maxVote {
 			predictedn = k
-			votes = v
-
+			maxVote = v
+			ties = nil
 		}
 
+		// keep track of the ties so that our predictions
+		// are deterministic
+		if v == maxVote {
+			ties = append(ties, k)
+		}
 	}
-	bb.Box[i].Mutex.Unlock()
-	if votes > 0 {
+	bb.Box[i].Mutex.RUnlock()
+
+	// if there is a tie in the predictions,
+	// then pick the smaller key
+	if len(ties) > 1 {
+		sort.Ints(ties)
+		predictedn = ties[0]
+	}
+
+	if maxVote > 0 {
 		predicted = bb.Back[predictedn]
 	} else {
 		predicted = "NA"
 	}
-
 	return
-
 }
 
 /*
@@ -86,33 +99,29 @@ xi is the set of samples with the ith actual label
 Case for which the true category is not known are ignored.
 
 */
-func (bb *CatBallotBox) TallyError(feature Feature) (e float64) {
+func (bb *CatBallotBox) TallyError(feature Feature) float64 {
 	catfeature := feature.(CatFeature)
 	ncats := catfeature.NCats()
 	correct := make([]int, ncats)
 	total := make([]int, ncats)
-	e = 0.0
-
 	for i := 0; i < feature.Length(); i++ {
 		value := catfeature.Geti(i)
-
 		predicted := bb.Tally(i)
-		if !feature.IsMissing(i) {
-			total[value]++
-			if catfeature.NumToCat(value) == predicted {
-				correct[value]++
-			}
-
+		if feature.IsMissing(i) {
+			continue
+		}
+		total[value]++
+		if catfeature.NumToCat(value) == predicted {
+			correct[value]++
 		}
 	}
 
+	var e float64
 	for i, ncorrect := range correct {
 		e += float64(ncorrect) / float64(total[i])
 	}
 
 	e /= float64(ncats)
 	e = 1.0 - e
-
-	return
-
+	return e
 }

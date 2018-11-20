@@ -1,9 +1,5 @@
 package CloudForest
 
-import (
-	"math/rand"
-)
-
 type Bagger interface {
 	Sample(samples *[]int, n int)
 }
@@ -37,8 +33,8 @@ func (s *BalancedSampler) Sample(samples *[]int, n int) {
 	nCases := len(s.Cases)
 	c := 0
 	for i := 0; i < n; i++ {
-		c = rand.Intn(nCases)
-		(*samples) = append((*samples), s.Cases[c][rand.Intn(len(s.Cases[c]))])
+		c = rnd.Intn(nCases)
+		(*samples) = append((*samples), s.Cases[c][rnd.Intn(len(s.Cases[c]))])
 	}
 
 }
@@ -83,7 +79,7 @@ func (s *SecondaryBalancedSampler) Sample(samples *[]int, n int) {
 	b := 0
 	c := 0
 	for i := 0; i < n; i++ {
-		b = rand.Intn(s.Total)
+		b = rnd.Intn(s.Total)
 		for j, v := range s.Counts {
 			b = b - v
 			if b < 0 || j == (len(s.Counts)-1) {
@@ -92,8 +88,8 @@ func (s *SecondaryBalancedSampler) Sample(samples *[]int, n int) {
 			}
 		}
 		nCases := len(s.Samplers[b])
-		c = rand.Intn(nCases)
-		(*samples) = append((*samples), s.Samplers[b][c][rand.Intn(len(s.Samplers[b][c]))])
+		c = rnd.Intn(nCases)
+		(*samples) = append((*samples), s.Samplers[b][c][rnd.Intn(len(s.Samplers[b][c]))])
 	}
 
 }
@@ -114,7 +110,7 @@ func SampleFirstN(deck *[]int, samples *[]int, n int, nconstants int) {
 	nnonconstant := length - nconstants
 	for i := 0; i < n && i < nnonconstant; i++ {
 
-		randi = lastSample + rand.Intn(length-nDrawnConstants-lastSample)
+		randi = lastSample + rnd.Intn(length-nDrawnConstants-lastSample)
 		//randi = lastSample + rand.Intn(nnonconstant-lastSample)
 		if randi >= nnonconstant {
 			nDrawnConstants++
@@ -139,7 +135,7 @@ for use in selecting cases to grow a tree from.
 func SampleWithReplacment(nSamples, totalCases int) []int {
 	cases := make([]int, nSamples)
 	for i := 0; i < nSamples; i++ {
-		cases[i] = rand.Intn(totalCases)
+		cases[i] = rnd.Intn(totalCases)
 	}
 	return cases
 }
@@ -149,5 +145,5 @@ SampleWithoutReplacement samples nSamples random draws from [0, totalCases] w/o 
 for use in selecting cases to grow a tree from.
 */
 func SampleWithoutReplacement(nSamples, totalCases int) []int {
-	return rand.Perm(totalCases)[:nSamples]
+	return rnd.Perm(totalCases)[:nSamples]
 }
