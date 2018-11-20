@@ -128,7 +128,7 @@ func main() {
 
 			for j := range cbb.CatMap.Back {
 				total := 0.0
-				total = box.Map[j]
+				total = box.Cat[j]
 
 				fmt.Fprintf(votefile, "\t%v", total)
 
