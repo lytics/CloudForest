@@ -28,8 +28,9 @@ type CatBallotBox struct {
 //NewCatBallotBox builds a new ballot box for the number of cases specified by "size".
 func NewCatBallotBox(size int) *CatBallotBox {
 	bb := CatBallotBox{
-		NewCatMap(),
-		make([]*CatBallot, 0, size)}
+		CatMap: NewCatMap(),
+		Box:    make([]*CatBallot, 0, size),
+	}
 	for i := 0; i < size; i++ {
 		bb.Box = append(bb.Box, NewCatBallot())
 	}

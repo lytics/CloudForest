@@ -3,6 +3,7 @@ package CloudForest
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	//"sort"
 	"math"
 	"strconv"
@@ -326,7 +327,7 @@ func (f *DenseNumFeature) BestNumSplit(target Target,
 		lasti := leafSize - 1
 
 		if randomSplit {
-			leafSize = leafSize + rnd.Intn(stop-leafSize)
+			leafSize = leafSize + rand.Intn(stop-leafSize)
 			lasti = leafSize - 1
 			stop = leafSize + 1
 
@@ -607,7 +608,7 @@ func (f *DenseNumFeature) Shuffle() {
 	capacity := len(f.Missing)
 	//shuffle
 	for j := 0; j < capacity; j++ {
-		sourcei := j + rnd.Intn(capacity-j)
+		sourcei := j + rand.Intn(capacity-j)
 		missing := f.Missing[j]
 		f.Missing[j] = f.Missing[sourcei]
 		f.Missing[sourcei] = missing
@@ -627,7 +628,7 @@ func (f *DenseNumFeature) ShuffleCases(cases *[]int) {
 	for j := 0; j < capacity; j++ {
 
 		targeti := (*cases)[j]
-		sourcei := (*cases)[j+rnd.Intn(capacity-j)]
+		sourcei := (*cases)[j+rand.Intn(capacity-j)]
 		missing := f.Missing[targeti]
 		f.Missing[targeti] = f.Missing[sourcei]
 		f.Missing[sourcei] = missing

@@ -5,14 +5,10 @@ import (
 	"io"
 	"log"
 	"math"
-	"math/rand"
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 )
-
-var rnd = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 func ParseFloat(s string) float64 {
 	frac, _ := strconv.ParseFloat(s, 64)

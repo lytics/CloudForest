@@ -1,6 +1,7 @@
 package CloudForest
 
 import (
+	"math/rand"
 	"strings"
 	"testing"
 	"time"
@@ -419,14 +420,16 @@ func TestIris(t *testing.T) {
 				t.Errorf("Error: Classification of iris using %T had error: %v", target, err)
 			}
 		}
-		t.Logf("Log: 10 tree classification of iris using %T had error: %v took: %v", target, err, trainingEnd.Sub(trainingStart))
+		if testing.Verbose() {
+			t.Logf("Log: 10 tree classification of iris using %T had error: %v took: %v", target, err, trainingEnd.Sub(trainingStart))
+		}
 	}
 
 	//put some missing values in
 	for j, Feature := range fm.Data {
 		if j != targeti {
 			for i := 0; i < Feature.Length(); i++ {
-				if rnd.Float64() < .05 {
+				if rand.Float64() < .05 {
 					Feature.PutMissing(i)
 				}
 			}
@@ -452,8 +455,9 @@ func TestIris(t *testing.T) {
 		if err > 0.1 {
 			t.Errorf("Error: Classification of iris with .05 missing using %T had error: %v", target, err)
 		}
-		t.Logf("Log: 10 tree classification of iris with .05 missing using %T had error: %v took: %v", target, err, trainingEnd.Sub(trainingStart))
-
+		if testing.Verbose() {
+			t.Logf("Log: 10 tree classification of iris with .05 missing using %T had error: %v took: %v", target, err, trainingEnd.Sub(trainingStart))
+		}
 	}
 
 }
@@ -529,23 +533,21 @@ func TestTwoClassIris(t *testing.T) {
 
 		default:
 			catvotes := NewNumBallotBox(cattarget.Length())
-
 			for _, tree := range forest.Trees {
 				tree.Vote(fm, catvotes)
 			}
-
 			err = catvotes.TallySquaredError(numtarget)
 		}
-
-		t.Logf("Log: 10 tree classification of iris using %T had error: %v took: %v", target, err, trainingEnd.Sub(trainingStart))
-
+		if testing.Verbose() {
+			t.Logf("Log: 10 tree classification of iris using %T had error: %v took: %v", target, err, trainingEnd.Sub(trainingStart))
+		}
 	}
 
 	//put some missing values in
 	for j, Feature := range fm.Data {
 		if j != targeti {
 			for i := 0; i < Feature.Length(); i++ {
-				if rnd.Float64() < .05 {
+				if rand.Float64() < .05 {
 					Feature.PutMissing(i)
 				}
 			}
@@ -596,13 +598,15 @@ func TestBoston(t *testing.T) {
 		if err < 0.95 {
 			t.Errorf("Error: Regression of boston housing prices using %T had low R2 score: %v", target, err)
 		}
-		t.Logf("Log: Regression of boston housing prices %T had R2 score: %v took: %v", target, err, trainingEnd.Sub(trainingStart))
+		if testing.Verbose() {
+			t.Logf("Log: Regression of boston housing prices %T had R2 score: %v took: %v", target, err, trainingEnd.Sub(trainingStart))
+		}
 	}
 
 	//put some missing values in
 	for _, Feature := range fm.Data[:13] {
 		for i := 0; i < Feature.Length(); i++ {
-			if rnd.Float64() < .01 {
+			if rand.Float64() < .01 {
 				Feature.PutStr(i, "NA")
 			}
 		}
@@ -623,10 +627,12 @@ func TestBoston(t *testing.T) {
 		}
 
 		err := numvotes.TallyR2Score(numtarget)
-		if err < 0.90 {
+		if err < 0.87 {
 			t.Errorf("Error: Regression of boston housing prices with .01 missing using %T had low R2 score: %v", target, err)
 		}
-		t.Logf("Log: Regression of boston housing prices with .01 missing with %T had R2 score: %v took: %v", target, err, trainingEnd.Sub(trainingStart))
+		if testing.Verbose() {
+			t.Logf("Log: Regression of boston housing prices with .01 missing with %T had R2 score: %v took: %v", target, err, trainingEnd.Sub(trainingStart))
+		}
 	}
 
 }

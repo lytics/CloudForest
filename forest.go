@@ -2,7 +2,6 @@ package CloudForest
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"strconv"
 	"sync"
@@ -194,7 +193,6 @@ func GrowRandomForest(fm *FeatureMatrix, target Target, config *ForestConfig) *F
 func (f *Forest) PredictAll(fm *FeatureMatrix) [][]float64 {
 
 	if fm.Data[0].NCats() != 0 {
-		log.Println("Error: the target variable is categorical, expected numerical")
 		return nil
 	}
 
@@ -243,7 +241,6 @@ func (f *Forest) Predict(fm *FeatureMatrix) []float64 {
 func (f *Forest) PredictCatAll(fm *FeatureMatrix) [][]string {
 
 	if len(fm.Data) > 0 && fm.Data[0].NCats() == 0 && fm.Data[0].Length() > 0 {
-		log.Println("Error: the target variable is numerical, expected categorical")
 		return nil
 	}
 

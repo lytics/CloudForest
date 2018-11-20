@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"os"
 	"strconv"
 	"strings"
@@ -298,7 +299,7 @@ func (fm *FeatureMatrix) BestSplitter(target Target,
 		if lcans > nDrawnConstants+lastSample {
 
 			randi = lastSample
-			randi += rnd.Intn(lcans - nDrawnConstants - lastSample)
+			randi += rand.Intn(lcans - nDrawnConstants - lastSample)
 			//randi = lastSample + rand.Intn(nnonconstant-lastSample)
 			if randi >= lcans-nConstants {
 				nDrawnConstants++
@@ -368,7 +369,7 @@ func (fm *FeatureMatrix) AddContrasts(n int) {
 	for i := 0; i < n; i++ {
 
 		//generate a shuffled copy
-		orig := fm.Data[rnd.Intn(nrealfeatures)]
+		orig := fm.Data[rand.Intn(nrealfeatures)]
 		fake := orig.ShuffledCopy()
 
 		fm.Map[fake.GetName()] = len(fm.Data)

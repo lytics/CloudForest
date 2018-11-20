@@ -670,7 +670,7 @@ func (f *DenseCatFeature) BestCatSplit(target Target,
 		bits = i
 		if !useExhaustive {
 			//generate random partition
-			bits = rnd.Int()
+			bits = rand.Int()
 		}
 
 		// //check the value of the j'th bit of i and
@@ -1162,7 +1162,7 @@ func (f *DenseCatFeature) Shuffle() {
 	capacity := len(f.Missing)
 	//shuffle
 	for j := 0; j < capacity; j++ {
-		sourcei := j + rnd.Intn(capacity-j)
+		sourcei := j + rand.Intn(capacity-j)
 		missing := f.Missing[j]
 		f.Missing[j] = f.Missing[sourcei]
 		f.Missing[sourcei] = missing
@@ -1182,7 +1182,7 @@ func (f *DenseCatFeature) ShuffleCases(cases *[]int) {
 	for j := 0; j < capacity; j++ {
 
 		targeti := (*cases)[j]
-		sourcei := (*cases)[j+rnd.Intn(capacity-j)]
+		sourcei := (*cases)[j+rand.Intn(capacity-j)]
 		missing := f.Missing[targeti]
 		f.Missing[targeti] = f.Missing[sourcei]
 		f.Missing[sourcei] = missing
