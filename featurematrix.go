@@ -49,13 +49,13 @@ func (fm *FeatureMatrix) StripStrings(target string) {
 		case *DenseCatFeature:
 			name := fmt.Sprintf("C:%v", i)
 			fm.Map[name] = i
-			f.(*DenseCatFeature).Name = name
-			f.(*DenseCatFeature).Map = make(map[string]int)
-			for j, v := range f.(*DenseCatFeature).Back {
+			dcf := f.(*DenseCatFeature)
+			dcf.Name = name
+			dcf.privateMap = make(map[string]int)
+			for j, v := range dcf.Back {
 				v = fmt.Sprintf("%v", j)
-				f.(*DenseCatFeature).Back[j] = v
-				f.(*DenseCatFeature).Map[v] = i
-
+				dcf.Back[j] = v
+				dcf.privateMap[v] = i
 			}
 
 		}
@@ -477,8 +477,7 @@ func Parse(input io.Reader, sep rune) *FeatureMatrix {
 						false})
 				} else {
 					data = append(data, &DenseCatFeature{
-						&CatMap{make(map[string]int, 0),
-							make([]string, 0, 0)},
+						NewCatMap(),
 						make([]int, 0, 0),
 						make([]bool, 0, 0),
 						label,
@@ -554,8 +553,7 @@ func ParseFeature(record []string) Feature {
 	switch record[0][0:2] {
 	case "C:":
 		f := &DenseCatFeature{
-			&CatMap{make(map[string]int, 0),
-				make([]string, 0, 0)},
+			NewCatMap(),
 			nil,
 			make([]bool, 0, capacity),
 			record[0],

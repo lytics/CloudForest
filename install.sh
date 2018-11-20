@@ -1,4 +1,5 @@
 #!/bin/bash
+set -x
 go install github.com/glycerine/CloudForest/growforest
 go install github.com/glycerine/CloudForest/applyforest
 go install github.com/glycerine/CloudForest/leafcount
