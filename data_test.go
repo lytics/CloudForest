@@ -383,7 +383,7 @@ func TestIris(t *testing.T) {
 		InBag:    true,
 	}
 
-	for _, target := range classtargets {
+	for idx, target := range classtargets {
 		trainingStart := time.Now()
 		model := GrowRandomForest(fm, target.(Feature), config)
 
@@ -405,7 +405,7 @@ func TestIris(t *testing.T) {
 		err := catvotes.TallyError(cattarget)
 		errCp := catvotesCp.TallyError(cattarget)
 		if err != errCp {
-			t.Fatal("Error: copied tree doesn't equal original tree")
+			t.Fatalf("Error: copied tree doesn't equal original tree, idx: %v \t %v != %v", idx, err, errCp)
 		}
 
 		switch cattarget.(type) {
@@ -420,7 +420,9 @@ func TestIris(t *testing.T) {
 				t.Errorf("Error: Classification of iris using %T had error: %v", target, err)
 			}
 		}
-		t.Logf("Log: 10 tree classification of iris using %T had error: %v took: %v", target, err, trainingEnd.Sub(trainingStart))
+		if testing.Verbose() {
+			t.Logf("Log: 10 tree classification of iris using %T had error: %v took: %v", target, err, trainingEnd.Sub(trainingStart))
+		}
 	}
 
 	//put some missing values in
@@ -453,8 +455,9 @@ func TestIris(t *testing.T) {
 		if err > 0.1 {
 			t.Errorf("Error: Classification of iris with .05 missing using %T had error: %v", target, err)
 		}
-		t.Logf("Log: 10 tree classification of iris with .05 missing using %T had error: %v took: %v", target, err, trainingEnd.Sub(trainingStart))
-
+		if testing.Verbose() {
+			t.Logf("Log: 10 tree classification of iris with .05 missing using %T had error: %v took: %v", target, err, trainingEnd.Sub(trainingStart))
+		}
 	}
 
 }
@@ -530,16 +533,14 @@ func TestTwoClassIris(t *testing.T) {
 
 		default:
 			catvotes := NewNumBallotBox(cattarget.Length())
-
 			for _, tree := range forest.Trees {
 				tree.Vote(fm, catvotes)
 			}
-
 			err = catvotes.TallySquaredError(numtarget)
 		}
-
-		t.Logf("Log: 10 tree classification of iris using %T had error: %v took: %v", target, err, trainingEnd.Sub(trainingStart))
-
+		if testing.Verbose() {
+			t.Logf("Log: 10 tree classification of iris using %T had error: %v took: %v", target, err, trainingEnd.Sub(trainingStart))
+		}
 	}
 
 	//put some missing values in
@@ -597,7 +598,9 @@ func TestBoston(t *testing.T) {
 		if err < 0.95 {
 			t.Errorf("Error: Regression of boston housing prices using %T had low R2 score: %v", target, err)
 		}
-		t.Logf("Log: Regression of boston housing prices %T had R2 score: %v took: %v", target, err, trainingEnd.Sub(trainingStart))
+		if testing.Verbose() {
+			t.Logf("Log: Regression of boston housing prices %T had R2 score: %v took: %v", target, err, trainingEnd.Sub(trainingStart))
+		}
 	}
 
 	//put some missing values in
@@ -624,10 +627,12 @@ func TestBoston(t *testing.T) {
 		}
 
 		err := numvotes.TallyR2Score(numtarget)
-		if err < 0.90 {
+		if err < 0.87 {
 			t.Errorf("Error: Regression of boston housing prices with .01 missing using %T had low R2 score: %v", target, err)
 		}
-		t.Logf("Log: Regression of boston housing prices with .01 missing with %T had R2 score: %v took: %v", target, err, trainingEnd.Sub(trainingStart))
+		if testing.Verbose() {
+			t.Logf("Log: Regression of boston housing prices with .01 missing with %T had R2 score: %v took: %v", target, err, trainingEnd.Sub(trainingStart))
+		}
 	}
 
 }

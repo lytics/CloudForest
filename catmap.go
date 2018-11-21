@@ -43,8 +43,8 @@ func (cm *CatMap) CopyCatMap() *CatMap {
 //it doesn't.
 func (cm *CatMap) CatToNum(value string) (numericv int) {
 	cm.CatMapMut.Lock()
-	numericv, exsists := cm.privateMap[value]
-	if exsists == false {
+	numericv, ok := cm.privateMap[value]
+	if !ok {
 		numericv = len(cm.Back)
 		cm.privateMap[value] = numericv
 		cm.Back = append(cm.Back, value)

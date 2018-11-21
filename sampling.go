@@ -1,8 +1,6 @@
 package CloudForest
 
-import (
-	"math/rand"
-)
+import "math/rand"
 
 type Bagger interface {
 	Sample(samples *[]int, n int)
