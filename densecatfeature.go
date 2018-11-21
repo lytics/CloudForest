@@ -25,10 +25,7 @@ type DenseCatFeature struct {
 
 func NewDenseCatFeature(name string) *DenseCatFeature {
 	return &DenseCatFeature{
-		CatMap: &CatMap{
-			Map:  make(map[string]int, 0),
-			Back: make([]string, 0, 0),
-		},
+		CatMap:       NewCatMap(),
 		CatData:      make([]int, 0, 0),
 		Missing:      make([]bool, 0, 0),
 		Name:         name,
@@ -74,10 +71,12 @@ func (f *DenseCatFeature) OneHot() (fs []Feature) {
 	l := f.Length()
 	if f.NCats() > 2 {
 		fs = make([]Feature, 0, f.NCats())
+		f.CatMapMut.Lock()
+		defer f.CatMapMut.Unlock()
 		for j, sv := range f.Back {
 			fn := &DenseCatFeature{
-				&CatMap{map[string]int{"false": 0, "true": 1},
-					[]string{"false", "true"}},
+				&CatMap{privateMap: map[string]int{"false": 0, "true": 1},
+					Back: []string{"false", "true"}},
 				make([]int, l, l),
 				f.Missing,
 				f.Name + "==" + sv,
@@ -1209,14 +1208,14 @@ func (f *DenseCatFeature) ShuffledCopy() Feature {
 /*Copy returns a copy of f.*/
 func (f *DenseCatFeature) Copy() Feature {
 	capacity := len(f.Missing)
+
 	fake := &DenseCatFeature{
-		&CatMap{f.Map,
-			f.Back},
-		nil,
-		make([]bool, capacity),
-		f.Name,
-		f.RandomSearch,
-		f.HasMissing}
+		CatMap:       f.CopyCatMap(),
+		CatData:      nil,
+		Missing:      make([]bool, capacity),
+		Name:         f.Name,
+		RandomSearch: f.RandomSearch,
+		HasMissing:   f.HasMissing}
 
 	copy(fake.Missing, f.Missing)
 
