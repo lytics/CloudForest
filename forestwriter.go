@@ -63,9 +63,9 @@ func (fw *ForestWriter) WriteForestHeader(
 		if err != nil {
 			panic(err)
 		}
-		cfgJson = fmt.Sprintf(`,PREDCONFIG="%s"`, string(by))
+		cfgJson = fmt.Sprintf(`,PREDCONFIG=%s`, string(by))
 	}
-	fmt.Fprintf(fw.w, "FOREST=%v,TARGET=\"%v\"%v%v%v\n",
+	fmt.Fprintf(fw.w, "FOREST=%v,TARGET=\"%v\"%v%v\n",
 		nforest,
 		target,
 		interceptterm,
