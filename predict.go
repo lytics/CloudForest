@@ -22,13 +22,15 @@ type Predictions struct {
 func getTallyerForForest(fm *FeatureMatrix, f *Forest) VoteTallyer {
 	n := fm.Data[fm.Map[f.Target]].Length()
 
+	if f.PredCfg.Gradboost != 0 || f.PredCfg.Adaboost {
+		return NewSumBallotBox(n)
+	}
+
 	switch f.Type {
 	case Regressor:
 		return NewNumBallotBox(n)
 	case Classifier:
 		return NewCatBallotBox(n)
-	case GBM:
-		return NewSumBallotBox(n)
 	}
 	panic(fmt.Sprintf("which BallotBox to use for ForestType %v ?", f.Type))
 }
@@ -67,7 +69,7 @@ func Predict(fm *FeatureMatrix, f *Forest) (*Predictions, error) {
 		var preds []float64
 		for i := 0; i < N; i++ {
 			pred := box.TallyNum(i) + f.Intercept
-			if f.Expit {
+			if f.PredCfg.Expit {
 				pred = Expit(pred)
 			}
 			preds = append(preds, pred)

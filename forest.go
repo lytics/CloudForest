@@ -20,7 +20,6 @@ type ForestType int
 const (
 	Classifier ForestType = iota
 	Regressor
-	GBM
 )
 
 func (ftype ForestType) String() string {
@@ -29,8 +28,6 @@ func (ftype ForestType) String() string {
 		return "Classifier"
 	case Regressor:
 		return "Regressor"
-	case GBM:
-		return "GBM"
 	}
 	panic(fmt.Sprintf("ForestType.String() error: unknown ftype %d", ftype))
 }
@@ -41,8 +38,6 @@ func StringToForestType(s string) ForestType {
 		return Classifier
 	case "Regressor":
 		return Regressor
-	case "GBM":
-		return GBM
 	}
 	panic(fmt.Sprintf("StringToForestType error: unknown ForestType: '%s'", s))
 }
@@ -53,8 +48,8 @@ type Forest struct {
 	Trees     []*Tree
 	Intercept float64
 
-	Type  ForestType
-	Expit bool
+	Type    ForestType
+	PredCfg *PredictConfig
 }
 
 func (f *Forest) Copy() *Forest {

@@ -2,6 +2,7 @@ package CloudForest
 
 import (
 	"bufio"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -103,6 +104,15 @@ func (fr *ForestReader) ReadTree() (tree *Tree, forest *Forest, err error) {
 			typ, hasType := parsed["TYPE"]
 			if hasType {
 				forest.Type = StringToForestType(strings.Trim(typ, `"`))
+			}
+			predCfgJSON, hasPredCfg := parsed["PREDCONFIG"]
+			if hasPredCfg {
+				predCfg := &PredictConfig{}
+				err := json.Unmarshal([]byte(predCfgJSON), predCfg)
+				if err != nil {
+					log.Print("Error parsing forest PREDCONFIG value ", err)
+				}
+				forest.PredCfg = predCfg
 			}
 
 		case strings.HasPrefix(line, "TREE"):
