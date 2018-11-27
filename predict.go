@@ -1,7 +1,11 @@
 package CloudForest
 
 import (
+	"bufio"
 	"fmt"
+	"os"
+	"strconv"
+	"strings"
 )
 
 // Predictions is returned by Predict().
@@ -78,4 +82,50 @@ func Predict(fm *FeatureMatrix, f *Forest) (*Predictions, error) {
 	default:
 		return nil, fmt.Errorf("Unknown tallyer type %T in Predict()", tallyer)
 	}
+}
+
+// read back predictions written to file
+// by applyforest
+
+type RealPredFile struct {
+	Rowname    []string
+	Prediction []float64
+	Actual     []float64
+}
+
+func ReadTabSeparatedPredictions(fn string) (rpf *RealPredFile, err error) {
+
+	var f *os.File
+	f, err = os.Open(fn)
+	if err != nil {
+		return
+	}
+	defer f.Close()
+	scanner := bufio.NewScanner(f)
+
+	rpf = &RealPredFile{}
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		fld := strings.Split(line, "\t")
+		for j := range fld {
+			fld[j] = strings.TrimSpace(fld[j])
+		}
+
+		rpf.Rowname = append(rpf.Rowname, fld[0])
+
+		f64, err := strconv.ParseFloat(fld[1], 64)
+		if err != nil {
+			f64 = nan
+		}
+		rpf.Prediction = append(rpf.Prediction, f64)
+
+		f64, err = strconv.ParseFloat(fld[2], 64)
+		if err != nil {
+			f64 = nan
+		}
+		rpf.Actual = append(rpf.Actual, f64)
+	}
+	err = scanner.Err()
+	return
 }
