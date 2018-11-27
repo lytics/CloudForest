@@ -391,6 +391,7 @@ func main() {
 	if caseoob != "" {
 		oob = true
 	}
+	var ftype CloudForest.ForestType
 	var oobVotes CloudForest.VoteTallyer
 	if oob {
 		fmt.Println("Recording oob error.")
@@ -413,6 +414,7 @@ func main() {
 		switch targetf.(type) {
 
 		case CloudForest.NumFeature:
+			ftype = CloudForest.Regressor
 			fmt.Println("Performing regression.")
 			if l1 {
 				fmt.Println("Using l1/absolute deviance error.")
@@ -424,6 +426,7 @@ func main() {
 			}
 			switch {
 			case gradboost != 0.0:
+				ftype = CloudForest.GBM
 				fmt.Println("Using Gradient Boosting.")
 				targetf = CloudForest.NewGradBoostTarget(targetf.(CloudForest.NumFeature), gradboost)
 
@@ -434,6 +437,7 @@ func main() {
 			target = targetf
 
 		case CloudForest.CatFeature:
+			ftype = CloudForest.Classifier
 			fmt.Printf("Performing classification with %v categories.\n", targetf.NCats())
 			switch {
 			case NP:
@@ -524,7 +528,7 @@ func main() {
 		forestwriter = CloudForest.NewForestWriter(forestfile)
 		switch target.(type) {
 		case CloudForest.TargetWithIntercept:
-			forestwriter.WriteForestHeader(0, *targetname, target.(CloudForest.TargetWithIntercept).Intercept())
+			forestwriter.WriteForestHeader(0, *targetname, target.(CloudForest.TargetWithIntercept).Intercept(), ftype)
 		}
 	}
 	//****************** Setup For ACE ********************************//

@@ -87,6 +87,7 @@ func (fr *ForestReader) ReadTree() (tree *Tree, forest *Forest, err error) {
 			return
 		}
 		parsed := fr.ParseRfAcePredictorLine(line)
+
 		switch {
 		case strings.HasPrefix(line, "FOREST"):
 			forest = new(Forest)
@@ -98,6 +99,10 @@ func (fr *ForestReader) ReadTree() (tree *Tree, forest *Forest, err error) {
 					log.Print("Error parsing forest intercept value ", err)
 				}
 				forest.Intercept = intercept
+			}
+			typ, hasType := parsed["TYPE"]
+			if hasType {
+				forest.Type = StringToForestType(strings.Trim(typ, `"`))
 			}
 
 		case strings.HasPrefix(line, "TREE"):

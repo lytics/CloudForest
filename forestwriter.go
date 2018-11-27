@@ -56,12 +56,12 @@ func (fw *ForestWriter) WriteForestHeader(
 	if intercept != 0.0 {
 		interceptterm = fmt.Sprintf(",INTERCEPT=%v", intercept)
 	}
-
+	typ := fmt.Sprintf(`,TYPE="%s"`, ftype.String())
 	fmt.Fprintf(fw.w, "FOREST=%v,TARGET=\"%v\"%v%v\n",
 		nforest,
 		target,
 		interceptterm,
-		ftype.String())
+		typ)
 }
 
 //WriteNodeAndChildren recursively writes out the target node and all of its children.
