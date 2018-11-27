@@ -101,10 +101,6 @@ func (fr *ForestReader) ReadTree() (tree *Tree, forest *Forest, err error) {
 				}
 				forest.Intercept = intercept
 			}
-			typ, hasType := parsed["TYPE"]
-			if hasType {
-				forest.Type = StringToForestType(strings.Trim(typ, `"`))
-			}
 			predCfgJSON, hasPredCfg := parsed["PREDCONFIG"]
 			if hasPredCfg {
 				predCfg := &PredictConfig{}
@@ -113,6 +109,7 @@ func (fr *ForestReader) ReadTree() (tree *Tree, forest *Forest, err error) {
 					log.Print("Error parsing forest PREDCONFIG value ", err)
 				}
 				forest.PredCfg = predCfg
+				forest.Type = StringToForestType(predCfg.Type)
 			}
 
 		case strings.HasPrefix(line, "TREE"):

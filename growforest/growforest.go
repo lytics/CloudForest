@@ -552,7 +552,7 @@ func main() {
 		case CloudForest.TargetWithIntercept:
 			icept = target.(CloudForest.TargetWithIntercept).Intercept()
 		}
-		forestwriter.WriteForestHeader(0, *targetname, icept, ftype, predCfg)
+		forestwriter.WriteForestHeader(0, *targetname, icept, predCfg)
 	}
 	//****************** Setup For ACE ********************************//
 	var aceImps [][]float64

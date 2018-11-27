@@ -25,7 +25,7 @@ func NewForestWriter(w io.Writer) *ForestWriter {
 
 //WriteForest writes an entire forest including all headers.
 func (fw *ForestWriter) WriteForest(forest *Forest) {
-	fw.WriteForestHeader(0, forest.Target, forest.Intercept, forest.Type, forest.PredCfg)
+	fw.WriteForestHeader(0, forest.Target, forest.Intercept, forest.PredCfg)
 	for i, tree := range forest.Trees {
 		fw.WriteTree(tree, i)
 	}
@@ -51,14 +51,12 @@ func (fw *ForestWriter) WriteForestHeader(
 	nforest int,
 	target string,
 	intercept float64,
-	ftype ForestType,
 	predCfg *PredictConfig,
 ) {
 	interceptterm := ""
 	if intercept != 0.0 {
 		interceptterm = fmt.Sprintf(",INTERCEPT=%v", intercept)
 	}
-	typ := fmt.Sprintf(`,TYPE="%s"`, ftype.String())
 	var cfgJson string
 	if predCfg != nil {
 		by, err := json.Marshal(predCfg)
@@ -71,7 +69,6 @@ func (fw *ForestWriter) WriteForestHeader(
 		nforest,
 		target,
 		interceptterm,
-		typ,
 		cfgJson)
 }
 
