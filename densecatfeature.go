@@ -99,7 +99,6 @@ func (f *DenseCatFeature) OneHot() (fs []Feature) {
 func (f *DenseCatFeature) Append(v string) {
 	norm := strings.ToLower(v)
 	if len(norm) == 0 || norm == "?" || norm == "nan" || norm == "na" || norm == "null" {
-
 		f.CatData = append(f.CatData, 0)
 		f.Missing = append(f.Missing, true)
 		f.HasMissing = true

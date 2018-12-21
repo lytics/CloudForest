@@ -16,7 +16,34 @@ var (
 	inBagFilePath = "n.csv"
 )
 
-func TestPartialDependency(t *testing.T) {
+func TestPartialDependencyCategorical(t *testing.T) {
+	irisreader := strings.NewReader(irislibsvm)
+	fm := ParseLibSVM(irisreader)
+
+	tgt := fm.Data[1]
+	model := GrowRandomForest(fm, tgt, &ForestConfig{
+		NSamples: fm.Data[1].Length(),
+		MTry:     3,
+		NTrees:   500,
+		LeafSize: 1,
+	})
+	forest := model.Forest
+
+	// Partial Dependency Plot with 1 variable
+	pdp, err := PDP(forest.Predict, fm, "0")
+	assert.Equal(t, nil, err)
+	assert.Equal(t, 3, len(pdp))
+
+	// ensure all the probabilities are unique
+	uniq := make(map[float64]struct{})
+	for _, x := range pdp {
+		assert.Equal(t, 2, len(x))
+		uniq[x[1]] = struct{}{}
+	}
+	assert.Equal(t, 3, len(uniq))
+}
+
+func TestPartialDependencyNumeric(t *testing.T) {
 	irisreader := strings.NewReader(irislibsvm)
 	fm := ParseLibSVM(irisreader)
 
@@ -38,7 +65,6 @@ func TestPartialDependency(t *testing.T) {
 		assert.Equal(t, nil, err)
 	}
 
-	// make a good model
 	tgt := fm.Data[0]
 	model := GrowRandomForest(fm, tgt, &ForestConfig{
 		NSamples: fm.Data[0].Length(),
