@@ -405,7 +405,7 @@ func PDP(f Predictor, data *FeatureMatrix, classes ...string) ([][]float64, erro
 	case 0:
 		return nil, fmt.Errorf("must provide at least one class")
 	case 1:
-		return singlePDP(f, data, classes[0]), nil
+		return singlePDP(f, data, classes[0])
 	case 2:
 		return doublePDP(f, data, classes[0], classes[1]), nil
 	default:
@@ -413,35 +413,99 @@ func PDP(f Predictor, data *FeatureMatrix, classes ...string) ([][]float64, erro
 	}
 }
 
-// singlePDP calculates the partial dependency of a single class
-func singlePDP(f Predictor, data *FeatureMatrix, class string) [][]float64 {
-	xv, idx, ok := toSeq(data, class)
+func singlePDP(f Predictor, data *FeatureMatrix, class string) ([][]float64, error) {
+	idx, ok := data.Map[class]
 	if !ok {
-		return nil
+		return nil, fmt.Errorf("class not found")
 	}
+	switch feature := data.Data[idx].(type) {
+	case *DenseNumFeature:
+		return singlePdpNumeric(f, data, idx, feature), nil
+	case *DenseCatFeature:
+		return singlePdpCategorical(f, data, idx, feature), nil
+	default:
+		return nil, fmt.Errorf("unsupported type %T", feature)
+	}
+	return nil, nil
+}
 
-	xData := data
-	n := data.Data[0].Length()
+// singlePdpCategorical calculates the partial dependency of a single categorical class
+func singlePdpCategorical(f Predictor, fm *FeatureMatrix, idx int, feature *DenseCatFeature) [][]float64 {
+	xv := denseCatFeatureToFeatureSet(feature)
+	n := fm.Data[0].Length()
 	output := make([][]float64, len(xv.values))
 
 	// reset the feature matrix
-	old := xData.Data[idx]
-	defer func() {
-		data.Data[idx] = old
-	}()
+	old := fm.Data[idx].(*DenseCatFeature)
+	defer func() { fm.Data[idx] = old }()
 
 	// find the mean prediction for each value in the grid
 	for i, val := range xv.values {
-		xData.Data[idx] = &DenseNumFeature{
+		cm := old.CopyCatMap()
+		numval := cm.CatToNum(val)
+		fm.Data[idx] = &DenseCatFeature{
+			CatMap:  cm,
+			CatData: repInt(numval, n),
+			Missing: make([]bool, n),
+			Name:    xv.name,
+		}
+		valInt := feature.CatToNum(val)
+		pred := meanSlice(f(fm))
+		output[i] = []float64{float64(valInt), pred}
+	}
+	return output
+}
+
+func denseCatFeatureToFeatureSet(xv *DenseCatFeature) *catFeatureSet {
+	n := xv.Length()
+	vals := make([]string, 0, n)
+	uniq := make(map[string]struct{})
+	for i := 0; i < xv.Length(); i++ {
+		str := xv.GetStr(i)
+		if _, ok := uniq[str]; ok {
+			continue
+		}
+		uniq[str] = struct{}{}
+		vals = append(vals, str)
+	}
+	return &catFeatureSet{xv.GetName(), vals}
+}
+
+// singlePdpNumeric calculates the partial dependency of a single numeric class
+func singlePdpNumeric(f Predictor, fm *FeatureMatrix, idx int, feature *DenseNumFeature) [][]float64 {
+	xv := denseNumFeatureToFeatureSet(feature)
+	n := fm.Data[0].Length()
+	output := make([][]float64, len(xv.values))
+
+	// reset the feature matrix
+	old := fm.Data[idx]
+	defer func() { fm.Data[idx] = old }()
+
+	// find the mean prediction for each value in the grid
+	for i, val := range xv.values {
+		fm.Data[idx] = &DenseNumFeature{
 			NumData: rep(val, n),
 			Missing: make([]bool, n),
 			Name:    xv.name,
 		}
+		output[i] = []float64{val, meanSlice(f(fm))}
+	}
+	return output
+}
 
-		output[i] = []float64{val, meanSlice(f(xData))}
+func denseNumFeatureToFeatureSet(xv *DenseNumFeature) *numFeatureSeq {
+	n := xv.Length()
+	vals := make([]float64, n)
+	uniq := make(map[float64]struct{})
+	for i := 0; i < xv.Length(); i++ {
+		val := xv.Get(i)
+		vals[i] = val
+		uniq[val] = struct{}{}
 	}
 
-	return output
+	nPts := minInt(len(uniq), maxSplits)
+	xPt := seq(minSlice(vals), maxSlice(vals), nPts)
+	return &numFeatureSeq{xv.GetName(), xPt}
 }
 
 // doublePDP calculates the partial dependency of two classes
@@ -491,13 +555,18 @@ func doublePDP(f Predictor, data *FeatureMatrix, classA, classB string) [][]floa
 	return output
 }
 
-type featureSeq struct {
+type numFeatureSeq struct {
 	name   string
 	values []float64
 }
 
+type catFeatureSet struct {
+	name   string
+	values []string
+}
+
 // toSeq converts returns a sequence of values for a given feature in the FM
-func toSeq(data *FeatureMatrix, class string) (*featureSeq, int, bool) {
+func toSeq(data *FeatureMatrix, class string) (*numFeatureSeq, int, bool) {
 	idx, ok := data.Map[class]
 	if !ok {
 		return nil, 0, false
@@ -523,7 +592,7 @@ func toSeq(data *FeatureMatrix, class string) (*featureSeq, int, bool) {
 
 	nPts := minInt(len(uniq), maxSplits)
 	xPt := seq(minSlice(vals), maxSlice(vals), nPts)
-	return &featureSeq{xv.GetName(), xPt}, idx, true
+	return &numFeatureSeq{xv.GetName(), xPt}, idx, true
 }
 
 func meanSlice(x []float64) float64 {
@@ -545,11 +614,20 @@ func rep(val float64, n int) []float64 {
 	}
 	return output
 }
+func repInt(val, n int) []int {
+	output := make([]int, n)
+	for i := range output {
+		output[i] = val
+	}
+	return output
+}
 
 func seq(start, end float64, n int) []float64 {
 	output := make([]float64, n)
-	if start > end || n == 0 {
+	if n == 0 {
 		return output
+	} else if start == end {
+		return rep(start, n)
 	}
 
 	step := (end - start) / float64(n-1)
