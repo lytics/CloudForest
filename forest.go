@@ -624,8 +624,10 @@ func repInt(val, n int) []int {
 
 func seq(start, end float64, n int) []float64 {
 	output := make([]float64, n)
-	if start > end || n == 0 {
+	if n == 0 {
 		return output
+	} else if start == end {
+		return rep(start, n)
 	}
 
 	step := (end - start) / float64(n-1)
