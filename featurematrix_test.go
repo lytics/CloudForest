@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/bmizerany/assert"
-	"github.com/gonum/matrix/mat64"
+	"gonum.org/v1/gonum/mat"
 )
 
 //A toy feature matrix where either of the first
@@ -98,10 +98,10 @@ func TestFmWrite(t *testing.T) {
 
 func TestMat64(t *testing.T) {
 	fm := readFm()
-	dense := fm.Mat64(false, false)
+	dense := fm.Matrix(false, false)
 
 	compareCol := func(i int, exp []float64) {
-		col := mat64.Col(nil, i, dense)
+		col := mat.Col(nil, i, dense)
 		assert.Equal(t, len(col), len(exp))
 		for i := range exp {
 			assert.Equal(t, col[i], exp[i])
