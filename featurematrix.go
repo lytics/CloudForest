@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/gonum/matrix/mat64"
+	"gonum.org/v1/gonum/mat"
 )
 
 //FeatureMatrix contains a slice of Features and a Map to look of the index of a feature
@@ -206,11 +206,12 @@ func (fm *FeatureMatrix) WriteFM(w io.Writer, sep string, header, transpose bool
 	return nil
 }
 
-func (fm *FeatureMatrix) Mat64(header, transpose bool) *mat64.Dense {
+// Matrix converts the FeatureMatrix into a Gonum Dense Matrix
+func (fm *FeatureMatrix) Matrix(header, transpose bool) *mat.Dense {
 	var (
 		idx   int
 		iter  fmIt
-		dense *mat64.Dense
+		dense *mat.Dense
 	)
 
 	ncol := len(fm.Data)
@@ -218,10 +219,10 @@ func (fm *FeatureMatrix) Mat64(header, transpose bool) *mat64.Dense {
 
 	if !transpose {
 		iter = rowIter(fm, header)
-		dense = mat64.NewDense(nrow, ncol, nil)
+		dense = mat.NewDense(nrow, ncol, nil)
 	} else {
 		iter = colIter(fm, header)
-		dense = mat64.NewDense(ncol, nrow+1, nil)
+		dense = mat.NewDense(ncol, nrow+1, nil)
 	}
 
 	for row, ok := iter(); ok; idx++ {
