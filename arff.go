@@ -10,7 +10,7 @@ import (
 )
 
 //ParseARFF reads a file in weka'sarff format:
-//http://www.cs.waikato.ac.nz/ml/weka/arff.html
+//http://www.cs.waikato.ac.nz/ml/weka/arff.htmlasdfasdfasdf
 //The relation is ignored and only catagorical and numerical variables are supported
 func ParseARFF(input io.Reader) *FeatureMatrix {
 
