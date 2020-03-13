@@ -116,3 +116,33 @@ func readFm() *FeatureMatrix {
 	fmReader := strings.NewReader(constantsfm)
 	return ParseAFM(fmReader)
 }
+
+func TestFeatureMatrixCopy(t *testing.T) {
+	fm := readFm()
+	fmCopy := fm.Copy()
+
+	// check feature matrix copy
+	for k, v := range fm.Map {
+		assert.Equal(t, v, fmCopy.Map[k])
+	}
+	for i, v := range fm.CaseLabels {
+		assert.Equal(t, v, fmCopy.CaseLabels[i])
+	}
+	assert.Equal(t, len(fm.Data), len(fmCopy.Data))
+	for i, feature := range fm.Data {
+		rows := fm.Data[1].Length()
+		featureCopy := fmCopy.Data[i]
+		assert.Equal(t, rows, featureCopy.Length())
+		for r := 0; r < rows; r++ {
+			assert.Equal(t, feature.GetStr(r), featureCopy.GetStr(r))
+		}
+	}
+
+	// alter original feature matrix
+	fm.CaseLabels = fm.CaseLabels[0 : len(fm.CaseLabels)-1]
+	delete(fm.Map, "C:Const1")
+	fm.Data = fm.Data[0 : len(fm.CaseLabels)-1]
+	assert.NotEqual(t, len(fm.Data), len(fmCopy.Data))
+	assert.NotEqual(t, len(fm.Map), len(fmCopy.Map))
+	assert.NotEqual(t, len(fm.CaseLabels), len(fmCopy.CaseLabels))
+}
