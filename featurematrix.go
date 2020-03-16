@@ -442,6 +442,23 @@ func (fm *FeatureMatrix) LoadCases(data *csv.Reader, rowlabels bool) {
 
 }
 
+// Makes a copy of the feature matrix
+func (fm *FeatureMatrix) Copy() *FeatureMatrix {
+	newmap := make(map[string]int)
+	newdata := make([]Feature, len(fm.Data))
+	for i, feature := range fm.Data {
+		newdata[i] = feature.Copy()
+		newmap[feature.GetName()] = fm.Map[feature.GetName()]
+	}
+	newslice := make([]string, len(fm.CaseLabels))
+	copy(newslice, fm.CaseLabels)
+	return &FeatureMatrix{
+		Data:       newdata,
+		Map:        newmap,
+		CaseLabels: newslice,
+	}
+}
+
 //Parse an AFM (annotated feature matrix) out of an io.Reader
 //AFM format is a tsv with row and column headers where the row headers start with
 //N: indicating numerical, C: indicating categorical or B: indicating boolean
