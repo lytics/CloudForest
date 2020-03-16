@@ -446,8 +446,8 @@ func (fm *FeatureMatrix) LoadCases(data *csv.Reader, rowlabels bool) {
 func (fm *FeatureMatrix) Copy() *FeatureMatrix {
 	newmap := make(map[string]int)
 	newdata := make([]Feature, 0, len(fm.Data))
-	for _, feature := range fm.Data {
-		newdata = append(newdata, feature.Copy())
+	for i, feature := range fm.Data {
+		newdata[i] = feature.Copy()
 		newmap[feature.GetName()] = fm.Map[feature.GetName()]
 	}
 	newslice := make([]string, len(fm.CaseLabels))
