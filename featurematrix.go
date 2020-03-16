@@ -445,7 +445,7 @@ func (fm *FeatureMatrix) LoadCases(data *csv.Reader, rowlabels bool) {
 // Makes a copy of the feature matrix
 func (fm *FeatureMatrix) Copy() *FeatureMatrix {
 	newmap := make(map[string]int)
-	newdata := make([]Feature, 0, len(fm.Data))
+	newdata := make([]Feature, len(fm.Data), len(fm.Data))
 	for i, feature := range fm.Data {
 		newdata[i] = feature.Copy()
 		newmap[feature.GetName()] = fm.Map[feature.GetName()]
