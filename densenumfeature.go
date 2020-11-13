@@ -76,6 +76,11 @@ func (f *DenseNumFeature) IsMissing(i int) bool {
 	return f.Missing[i]
 }
 
+//IsZero checks if the value for the i'th case is zero valued.
+func (f *DenseNumFeature) IsZero(i int) bool {
+	return f.NumData[i] == 0
+}
+
 //MissingVals checks if the feature has any missing values.
 func (f *DenseNumFeature) MissingVals() bool {
 	return f.HasMissing

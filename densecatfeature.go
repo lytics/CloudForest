@@ -123,6 +123,11 @@ func (f *DenseCatFeature) IsMissing(i int) bool {
 	return f.Missing[i]
 }
 
+//IsZero returns weather the given case is missing in the feature.
+func (f *DenseCatFeature) IsZero(i int) bool {
+	return f.IsMissing(i)
+}
+
 //MissingVals returns weather the feature has any missing values.
 func (f *DenseCatFeature) MissingVals() bool {
 	return f.HasMissing
