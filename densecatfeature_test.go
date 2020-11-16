@@ -200,6 +200,19 @@ func TestCatFeature(t *testing.T) {
 
 	//target.Append(v)
 
+	f = &DenseCatFeature{
+		NewCatMap(),
+		make([]int, 0, 0),
+		make([]bool, 0, 0),
+		"tmp",
+		false,
+		false}
+
+	f.Append("")
+
+	if !f.IsMissing(0) || !f.IsZero(0) {
+		t.Errorf("feature should be missing (%v), and be of zero value (%v)", f.IsMissing(0), f.IsZero(0))
+	}
 }
 
 func TestBigCatFeature(t *testing.T) {

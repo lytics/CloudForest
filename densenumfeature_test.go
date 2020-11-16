@@ -129,4 +129,13 @@ func TestNumFeature(t *testing.T) {
 		t.Errorf("After Coded Numerical Split between equal runs Left, Right, Missing Lengths = %v %v %v not 5 3 0", len(l), len(r), len(m))
 	}
 
+	f = &DenseNumFeature{
+		make([]float64, 0, 0),
+		make([]bool, 0, 0),
+		name,
+		false}
+	f.Append("0")
+	if f.IsMissing(0) || !f.IsZero(0) {
+		t.Errorf("feature should not be missing (%v), and be of zero value (%v)", !f.IsMissing(0), f.IsZero(0))
+	}
 }
