@@ -21,6 +21,7 @@ import (
 )
 
 func main() {
+
 	fm := flag.String("train",
 		"featurematrix.afm", "AFM formated feature matrix containing training data.")
 	rf := flag.String("rfpred",
@@ -184,6 +185,9 @@ func main() {
 
 	var noseed bool
 	flag.BoolVar(&noseed, "noseed", false, "Don't seed the random number generator from time.")
+
+	var expit bool
+	flag.BoolVar(&expit, "expit", false, "Expit (inverse logit) transform data (for gradient boosting classification).")
 
 	flag.Parse()
 
@@ -391,6 +395,7 @@ func main() {
 	if caseoob != "" {
 		oob = true
 	}
+	var ftype CloudForest.ForestType
 	var oobVotes CloudForest.VoteTallyer
 	if oob {
 		fmt.Println("Recording oob error.")
@@ -413,6 +418,7 @@ func main() {
 		switch targetf.(type) {
 
 		case CloudForest.NumFeature:
+			ftype = CloudForest.Regressor
 			fmt.Println("Performing regression.")
 			if l1 {
 				fmt.Println("Using l1/absolute deviance error.")
@@ -434,6 +440,7 @@ func main() {
 			target = targetf
 
 		case CloudForest.CatFeature:
+			ftype = CloudForest.Classifier
 			fmt.Printf("Performing classification with %v categories.\n", targetf.NCats())
 			switch {
 			case NP:
@@ -514,6 +521,24 @@ func main() {
 		}
 	}
 
+	// things that applyforest will need to know.
+	predCfg := &CloudForest.PredictConfig{
+		Type:       ftype.String(),
+		Targetname: *targetname,
+		Costs:      *costs,
+		Dentropy:   *dentropy,
+		Adacosts:   *adacosts,
+		Rfweights:  *rfweights,
+		Blacklist:  *blacklist,
+		L1:         l1,
+		Density:    density,
+		Positive:   positive,
+		Entropy:    entropy,
+		Adaboost:   adaboost,
+		Gradboost:  gradboost,
+		Ordinal:    ordinal,
+	}
+
 	var forestwriter *CloudForest.ForestWriter
 	if *rf != "" {
 		forestfile, err := os.Create(*rf)
@@ -522,10 +547,12 @@ func main() {
 		}
 		defer forestfile.Close()
 		forestwriter = CloudForest.NewForestWriter(forestfile)
+		var icept float64
 		switch target.(type) {
 		case CloudForest.TargetWithIntercept:
-			forestwriter.WriteForestHeader(0, *targetname, target.(CloudForest.TargetWithIntercept).Intercept())
+			icept = target.(CloudForest.TargetWithIntercept).Intercept()
 		}
+		forestwriter.WriteForestHeader(0, *targetname, icept, predCfg)
 	}
 	//****************** Setup For ACE ********************************//
 	var aceImps [][]float64

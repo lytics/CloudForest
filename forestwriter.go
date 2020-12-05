@@ -1,6 +1,7 @@
 package CloudForest
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"strings"
@@ -24,9 +25,7 @@ func NewForestWriter(w io.Writer) *ForestWriter {
 
 //WriteForest writes an entire forest including all headers.
 func (fw *ForestWriter) WriteForest(forest *Forest) {
-	if forest.Intercept != 0.0 {
-		fw.WriteForestHeader(0, forest.Target, forest.Intercept)
-	}
+	fw.WriteForestHeader(0, forest.Target, forest.Intercept, forest.PredCfg)
 	for i, tree := range forest.Trees {
 		fw.WriteTree(tree, i)
 	}
@@ -48,12 +47,29 @@ func (fw *ForestWriter) WriteTreeHeader(ntree int, target string, weight float64
 }
 
 //WrieTreeHeader writes only the header line for a tree.
-func (fw *ForestWriter) WriteForestHeader(nforest int, target string, intercept float64) {
+func (fw *ForestWriter) WriteForestHeader(
+	nforest int,
+	target string,
+	intercept float64,
+	predCfg *PredictConfig,
+) {
 	interceptterm := ""
 	if intercept != 0.0 {
 		interceptterm = fmt.Sprintf(",INTERCEPT=%v", intercept)
 	}
-	fmt.Fprintf(fw.w, "FOREST=%v,TARGET=\"%v\"%v\n", nforest, target, interceptterm)
+	var cfgJson string
+	if predCfg != nil {
+		by, err := json.Marshal(predCfg)
+		if err != nil {
+			panic(err)
+		}
+		cfgJson = fmt.Sprintf(`,PREDCONFIG=%s`, string(by))
+	}
+	fmt.Fprintf(fw.w, "FOREST=%v,TARGET=\"%v\"%v%v\n",
+		nforest,
+		target,
+		interceptterm,
+		cfgJson)
 }
 
 //WriteNodeAndChildren recursively writes out the target node and all of its children.

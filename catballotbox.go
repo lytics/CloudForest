@@ -126,3 +126,9 @@ func (bb *CatBallotBox) TallyError(feature Feature) float64 {
 	e = 1.0 - e
 	return e
 }
+
+// TallyNum always returns NaN for a SumBallotBox; we
+// meet the demands of the expanded VoteTallyer interface.
+func (bb *CatBallotBox) TallyNum(i int) (predicted float64) {
+	return nan
+}

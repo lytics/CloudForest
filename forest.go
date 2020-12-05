@@ -10,15 +10,46 @@ import (
 )
 
 var (
+	nan                = math.NaN()
 	mTryRegression     = func(x int) int { return int(math.Ceil(float64(x) / 3.0)) }
 	mTryClassification = func(x int) int { return int(math.Ceil(math.Sqrt(float64(x)))) }
 )
+
+type ForestType int
+
+const (
+	Classifier ForestType = iota
+	Regressor
+)
+
+func (ftype ForestType) String() string {
+	switch ftype {
+	case Classifier:
+		return "Classifier"
+	case Regressor:
+		return "Regressor"
+	}
+	panic(fmt.Sprintf("ForestType.String() error: unknown ftype %d", ftype))
+}
+
+func StringToForestType(s string) ForestType {
+	switch s {
+	case "Classifier":
+		return Classifier
+	case "Regressor":
+		return Regressor
+	}
+	panic(fmt.Sprintf("StringToForestType error: unknown ForestType: '%s'", s))
+}
 
 //Forest represents a collection of decision trees grown to predict the Target
 type Forest struct {
 	Target    string
 	Trees     []*Tree
 	Intercept float64
+
+	Type    ForestType
+	PredCfg *PredictConfig
 }
 
 func (f *Forest) Copy() *Forest {
@@ -35,6 +66,7 @@ func (f *Forest) Copy() *Forest {
 		Target:    f.Target,
 		Intercept: f.Intercept,
 		Trees:     trees,
+		Type:      f.Type,
 	}
 }
 
@@ -211,7 +243,7 @@ func (f *Forest) PredictAll(fm *FeatureMatrix) [][]float64 {
 					if val, err := strconv.ParseFloat(n.Pred, 64); err == nil {
 						predictions[j][i] = val
 					} else {
-						predictions[j][i] = math.NaN()
+						predictions[j][i] = nan
 					}
 				}
 			}
